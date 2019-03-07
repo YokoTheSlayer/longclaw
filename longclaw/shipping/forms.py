@@ -5,7 +5,7 @@ from longclaw.shipping.models import Address, Country
 class AddressForm(ModelForm):
     class Meta:
         model = Address
-        fields = ['name', 'line_1', 'line_2', 'city', 'postcode', 'country']
+        fields = ['name']
 
     def __init__(self, *args, **kwargs):
         site = kwargs.pop('site', None)

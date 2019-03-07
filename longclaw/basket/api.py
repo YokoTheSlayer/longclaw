@@ -26,7 +26,6 @@ class BasketViewSet(viewsets.ModelViewSet):
 
         if variant_id is not None:
             variant = ProductVariant.objects.get(id=variant_id)
-
             quantity = int(request.data.get("quantity", 1))
             items, bid = utils.get_basket_items(request)
 
@@ -38,7 +37,7 @@ class BasketViewSet(viewsets.ModelViewSet):
                     in_basket = True
                     break
             if not in_basket:
-                item = BasketItem(variant=variant, quantity=quantity, basket_id=bid)
+                item = BasketItem(variant=variant,quantity=quantity, basket_id=bid)
                 item.save()
 
             serializer = BasketItemSerializer(self.get_queryset(request), many=True)

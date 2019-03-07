@@ -11,13 +11,13 @@ class BasketItem(models.Model):
         ordering = ['date_added']
 
     def __str__(self):
-        return "{}x {}".format(self.quantity, self.variant)
+        return "{}x {}".format(self.quantity)
 
     def total(self):
         return self.quantity * self.variant.price
 
     def name(self):
-        return self.variant.__str__()
+        return self.__str__()
 
     def price(self):
         return self.variant.price

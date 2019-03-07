@@ -22,7 +22,7 @@ def sales_for_time_period(from_date, to_date):
     """
     sales = Order.objects.filter(
         Q(payment_date__lte=to_date) & Q(payment_date__gte=from_date)
-    ).exclude(status=Order.CANCELLED)
+    ).exclude(status=Order.SHIPPED)
 
     return sales
 
@@ -36,7 +36,7 @@ def sales_by_product(from_date, to_date):
     sales = OrderItem.objects.filter(
         Q(order__payment_date__lte=to_date) & Q(order__payment_date__gte=from_date)
     ).exclude(
-        order__status=Order.CANCELLED
+        order__status=Order.SHIPPED
     ).annotate(
         title=F('product__product__title')
     ).values(

@@ -6,14 +6,14 @@ from longclaw.shipping.models import Address
 class Order(models.Model):
     SUBMITTED = 1
     FULFILLED = 2
-    CANCELLED = 3
-    REFUNDED = 4
-    FAILURE = 5
-    ORDER_STATUSES = ((SUBMITTED, 'Submitted'),
-                      (FULFILLED, 'Fulfilled'),
-                      (CANCELLED, 'Cancelled'),
-                      (REFUNDED, 'Refunded'),
-                      (FAILURE, 'Payment Failed'))
+    PAID_UP = 3
+    IN_PROCESS = 4
+    SHIPPED = 5
+    ORDER_STATUSES = ((SUBMITTED, 'Cформирован'),
+                      (FULFILLED, 'Подтвержден'),
+                      (PAID_UP, 'Оплачен'),
+                      (IN_PROCESS, 'В процессе оплаты'),
+                      (SHIPPED, 'Отгружен'))
     payment_date = models.DateTimeField(blank=True, null=True)
     created_date = models.DateTimeField(auto_now_add=True)
     status = models.IntegerField(choices=ORDER_STATUSES, default=SUBMITTED)
@@ -23,20 +23,9 @@ class Order(models.Model):
 
     # contact info
     email = models.EmailField(max_length=128, blank=True, null=True)
-    ip_address = models.GenericIPAddressField(blank=True, null=True)
-
     # shipping info
     shipping_address = models.ForeignKey(
         Address, blank=True, null=True, related_name="orders_shipping_address", on_delete=models.PROTECT)
-
-    # billing info
-    billing_address = models.ForeignKey(
-        Address, blank=True, null=True, related_name="orders_billing_address", on_delete=models.PROTECT)
-
-    shipping_rate = models.DecimalField(max_digits=12,
-                                        decimal_places=2,
-                                        blank=True,
-                                        null=True)
 
     def __str__(self):
         return "Order #{} - {}".format(self.id, self.email)
@@ -57,17 +46,17 @@ class Order(models.Model):
         return self.items.count()
 
 
-    def refund(self):
-        """Issue a full refund for this order
-        """
-        from longclaw.utils import GATEWAY
-        now = datetime.strftime(datetime.now(), "%b %d %Y %H:%M:%S")
-        if GATEWAY.issue_refund(self.transaction_id, self.total):
-            self.status = self.REFUNDED
-            self.status_note = "Refunded on {}".format(now)
-        else:
-            self.status_note = "Refund failed on {}".format(now)
-        self.save()
+  #  def refund(self):
+  #      """Issue a full refund for this order
+  #      """
+  #      from longclaw.utils import GATEWAY
+  #      now = datetime.strftime(datetime.now(), "%b %d %Y %H:%M:%S")
+  #      if GATEWAY.issue_refund(self.transaction_id, self.total):
+  #          self.status = self.REFUNDED
+  #          self.status_note = "Refunded on {}".format(now)
+  #      else:
+  #          self.status_note = "Refund failed on {}".format(now)
+  #      self.save()
 
     def fulfill(self):
         """Mark this order as being fulfilled
@@ -75,13 +64,31 @@ class Order(models.Model):
         self.status = self.FULFILLED
         self.save()
 
-    def cancel(self, refund=True):
-        """Cancel this order, optionally refunding it
+    def paid_up(self):
+        """Mark this order as being paid_up
         """
-        if refund:
-            self.refund()
-        self.status = self.CANCELLED
+        self.status = self.PAID_UP
         self.save()
+
+    def shipped(self):
+        """Mark this order as being shipped
+        """
+        self.status = self.SHIPPED
+        self.save()
+
+    def in_process(self):
+        """Mark this order as being in process
+        """
+        self.status = self.IN_PROCESS
+        self.save()
+
+  #  def cancel(self, refund=True):
+  #      """Cancel this order, optionally refunding it
+  #      """
+  #      if refund:
+  #          self.refund()
+  #      self.status = self.CANCELLED
+  #      self.save()
 
 class OrderItem(models.Model):
     product = models.ForeignKey(PRODUCT_VARIANT_MODEL, on_delete=models.DO_NOTHING)

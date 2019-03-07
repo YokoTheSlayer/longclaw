@@ -3,7 +3,7 @@ from rest_framework import serializers
 from longclaw.shipping.models import Address, ShippingRate, Country
 
 class AddressSerializer(serializers.ModelSerializer):
-    country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all())
+    #country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all())
     class Meta:
         model = Address
         fields = "__all__"

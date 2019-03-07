@@ -25,7 +25,6 @@ class CheckoutView(TemplateView):
     template_name = "checkout/checkout.html"
     checkout_form = CheckoutForm
     shipping_address_form = AddressForm
-    billing_address_form = AddressForm
 
     def get_context_data(self, **kwargs):
         context = super(CheckoutView, self).get_context_data(**kwargs)
@@ -37,10 +36,6 @@ class CheckoutView(TemplateView):
         context['shipping_form'] = self.shipping_address_form(
             self.request.POST or None,
             prefix='shipping',
-            site=site)
-        context['billing_form'] = self.billing_address_form(
-            self.request.POST or None,
-            prefix='billing',
             site=site)
         context['basket'] = items
         context['total_price'] = total_price
@@ -57,20 +52,11 @@ class CheckoutView(TemplateView):
                 'shipping_option', None)
             shipping_address = shipping_form.save()
 
-            if checkout_form.cleaned_data['different_billing_address']:
-                billing_form = context['billing_form']
-                all_ok = billing_form.is_valid()
-                if all_ok:
-                    billing_address = billing_form.save()
-            else:
-                billing_address = shipping_address
-
         if all_ok:
             order = create_order(
                 email,
                 request,
                 shipping_address=shipping_address,
-                billing_address=billing_address,
                 shipping_option=shipping_option,
                 capture_payment=True
             )

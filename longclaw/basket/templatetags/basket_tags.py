@@ -21,3 +21,7 @@ def add_to_basket_btn(variant_id, btn_class="btn btn-default", btn_text="Add To 
         'variant_id': variant_id,
         'btn_text': btn_text
     }
+@register.simple_tag(takes_context=True)
+def basket_count(context):
+    items, _ = get_basket_items(context["request"])
+    return len(list(items))

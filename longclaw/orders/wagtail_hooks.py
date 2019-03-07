@@ -23,10 +23,10 @@ class OrderButtonHelper(ButtonHelper):
         classnames = self.cancel_button_classnames + classnames_add
         cn = self.finalise_classname(classnames, classnames_exclude)
         return {
-            'url': '',
-            'label': _('Cancel'),
+            'url': self.url_helper.get_action_url('delete', quote(pk)),
+            'label': _('Отменить'),
             'classname': cn,
-            'title': _('Cancel this %s') % self.verbose_name,
+            'title': _('Отменить этот заказ?') #%s') % self.verbose_name,
         }
 
     def detail_button(self, pk, classnames_add=None, classnames_exclude=None):

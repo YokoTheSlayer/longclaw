@@ -5,7 +5,7 @@ from longclaw.orders.models import Order
 from longclaw.stats import stats
 from longclaw.configuration.models import Configuration
 from longclaw.utils import ProductVariant, maybe_get_product_model
-
+#from longclaw.utils import maybe_get_product_model
 
 class LongclawSummaryItem(SummaryItem):
     order = 10
@@ -37,7 +37,7 @@ class ProductCount(LongclawSummaryItem):
         if product_model:
             count = product_model.objects.all().count()
         else:
-            count = ProductVariant.objects.all().count()
+            count = Product.objects.all().count()
         return {
             'total': count,
             'text': 'Product',

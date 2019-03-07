@@ -11,11 +11,11 @@ class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
 
     @detail_route(methods=['post'])
-    def refund_order(self, request, pk):
+    def shipped_order(self, request, pk):
         """Refund the order specified by the pk
         """
         order = Order.objects.get(id=pk)
-        order.refund()
+        order.shipped()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @detail_route(methods=['post'])
@@ -24,4 +24,12 @@ class OrderViewSet(viewsets.ModelViewSet):
         """
         order = Order.objects.get(id=pk)
         order.fulfill()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @detail_route(methods=['post'])
+    def in_process_order(self, request, pk):
+        """Mark the order specified by pk as fulfilled
+        """
+        order = Order.objects.get(id=pk)
+        order.in_process()
         return Response(status=status.HTTP_204_NO_CONTENT)

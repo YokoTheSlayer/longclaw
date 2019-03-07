@@ -7,23 +7,14 @@ from wagtail.snippets.models import register_snippet
 @register_snippet
 class Address(models.Model):
     name = models.CharField(max_length=64)
-    line_1 = models.CharField(max_length=128)
-    line_2 = models.CharField(max_length=128, blank=True)
-    city = models.CharField(max_length=64)
-    postcode = models.CharField(max_length=10)
-    country = models.ForeignKey('shipping.Country', blank=True, null=True, on_delete=models.PROTECT)
 
     panels = [
         FieldPanel('name'),
-        FieldPanel('line_1'),
-        FieldPanel('line_2'),
-        FieldPanel('city'),
-        FieldPanel('postcode'),
-        FieldPanel('country')
+
     ]
 
     def __str__(self):
-        return "{}, {}, {}".format(self.name, self.city, self.country)
+        return "{}".format(self.name)
 
 class ShippingRate(models.Model):
     """
