@@ -1,7 +1,13 @@
+import smtplib
 from datetime import datetime
+from email.mime.text import MIMEText
+from os import environ
+
+from django.core.mail import send_mail
 from django.db import models
 from longclaw.settings import PRODUCT_VARIANT_MODEL
 from longclaw.shipping.models import Address
+
 
 class Order(models.Model):
     SUBMITTED = 1
@@ -46,39 +52,44 @@ class Order(models.Model):
         return self.items.count()
 
 
-  #  def refund(self):
-  #      """Issue a full refund for this order
-  #      """
-  #      from longclaw.utils import GATEWAY
-  #      now = datetime.strftime(datetime.now(), "%b %d %Y %H:%M:%S")
-  #      if GATEWAY.issue_refund(self.transaction_id, self.total):
-  #          self.status = self.REFUNDED
-  #          self.status_note = "Refunded on {}".format(now)
-  #      else:
-  #          self.status_note = "Refund failed on {}".format(now)
-  #      self.save()
+    def send_email_sc(self):
+        """
+        Send email to user with info about status change
+        """
+        msg = MIMEText('Status of your order now: "{}"'.format(self.ORDER_STATUSES[self.status][1]))
+        msg['Subject'] = ("Your status was changed")
+        msg['From'] = environ['SMTP_HOST_LOGIN']
+        msg['To'] = self.email
+        s = smtplib.SMTP_SSL(environ['SMTP_HOST'], environ['SMTP_PORT'])
+        s.login(environ['SMTP_HOST_LOGIN'], environ['SMTP_HOST_PASSWORD'])
+        s.sendmail(msg['From'], msg['To'], msg.as_string())
+        s.quit()
 
     def fulfill(self):
         """Mark this order as being fulfilled
         """
+        self.send_email_sc()
         self.status = self.FULFILLED
         self.save()
 
     def paid_up(self):
         """Mark this order as being paid_up
         """
+        self.send_email_sc()
         self.status = self.PAID_UP
         self.save()
 
     def shipped(self):
         """Mark this order as being shipped
         """
+        self.send_email_sc()
         self.status = self.SHIPPED
         self.save()
 
     def in_process(self):
         """Mark this order as being in process
         """
+        self.send_email_sc()
         self.status = self.IN_PROCESS
         self.save()
 
