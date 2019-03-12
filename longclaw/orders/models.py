@@ -26,6 +26,7 @@ class Order(models.Model):
     status_note = models.CharField(max_length=128, blank=True, null=True)
 
     transaction_id = models.CharField(max_length=256, blank=True, null=True)
+    mpay_id = models.CharField(max_length=150, blank=True, null=True)
 
     # contact info
     email = models.EmailField(max_length=128, blank=True, null=True)
@@ -92,14 +93,6 @@ class Order(models.Model):
         self.send_email_sc()
         self.status = self.IN_PROCESS
         self.save()
-
-  #  def cancel(self, refund=True):
-  #      """Cancel this order, optionally refunding it
-  #      """
-  #      if refund:
-  #          self.refund()
-  #      self.status = self.CANCELLED
-  #      self.save()
 
 class OrderItem(models.Model):
     product = models.ForeignKey(PRODUCT_VARIANT_MODEL, on_delete=models.DO_NOTHING)
